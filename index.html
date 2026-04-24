@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Video Player</title>
+    <style>
+        /* Basic styles for the body to center content */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            color: #1c1e21;
+        }
+
+        /* Main container for the entire player and controls */
+        .player-wrapper {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 700px;
+        }
+
+        /* Container for the video element for spacing */
+        .video-container {
+            width: 100%;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            overflow: hidden; /* Ensures the video corners are rounded */
+            background-color: #000;
+        }
+        
+        /* The video element itself */
+        video {
+            width: 100%;
+            display: block;
+        }
+
+        /* Container for the input and button */
+        .controls-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* URL input field styling */
+        #video-url {
+            padding: 12px 15px;
+            border: 1px solid #dddfe2;
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        #video-url:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        /* Load video button styling */
+        #load-video {
+            padding: 12px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        #load-video:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Responsive adjustments for smaller screens */
+        @media (min-width: 600px) {
+            .controls-container {
+                flex-direction: row;
+            }
+            #video-url {
+                flex-grow: 1; /* Allows the input to take up available space */
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="player-wrapper">
+        <!-- The video container holds the video element -->
+        <div class="video-container">
+            <video id="my-video" controls poster="https://placehold.co/600x400/000000/FFFFFF?text=Enter+a+video+URL">
+                <!-- The source will be set dynamically by JavaScript -->
+                <source src="" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+
+        <!-- The controls container holds the input field and button -->
+        <div class="controls-container">
+            <input type="url" id="video-url" placeholder="Enter video URL and click Load">
+            <button id="load-video">Load Video</button>
+        </div>
+    </div>
+
+    <script>
+        // Get references to the HTML elements
+        const video = document.getElementById('my-video');
+        const videoSource = video.querySelector('source');
+        const videoUrlInput = document.getElementById('video-url');
+        const loadVideoButton = document.getElementById('load-video');
+
+        /**
+         * Attempts to open the given HTML element in full-screen mode.
+         * Includes fallbacks for different browser vendors.
+         * @param {HTMLElement} elem - The element to make full-screen.
+         */
+        function openFullscreen(elem) {
+          if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+          } else if (elem.webkitRequestFullscreen) { /* Safari */
+            elem.webkitRequestFullscreen();
+          } else if (elem.msRequestFullscreen) { /* IE11 */
+            elem.msRequestFullscreen();
+          }
+        }
+
+        // Add a click event listener to the "Load Video" button
+        loadVideoButton.addEventListener('click', () => {
+            const videoUrl = videoUrlInput.value.trim();
+
+            // Check if the input URL is not empty
+            if (videoUrl) {
+                // Set the src attribute of the source element
+                videoSource.setAttribute('src', videoUrl);
+                
+                // Load the new video source into the video element
+                video.load();
+                
+                // Play the video
+                video.play().then(() => {
+                    // Once playback starts successfully, request fullscreen
+                    openFullscreen(video);
+                }).catch(error => {
+                    // Handle potential errors, like browser blocking autoplay
+                    console.error("Error playing video:", error);
+                    alert("Could not play the video. Please check the URL or browser settings.");
+                });
+
+            } else {
+                alert("Please enter a video URL.");
+            }
+        });
+    </script>
+
+</body>
+</html>
